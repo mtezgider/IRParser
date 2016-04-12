@@ -10,11 +10,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import static java.nio.file.Files.lines;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,18 +28,21 @@ public class Parser {
 
     public static void main(String[] args) {
         Parser p = new Parser();
+        // input directory
         List<File> fileList = new ArrayList<>();
         p.getFilesRecursive(new File("/home/hduser/Desktop/bil625_data/1  Murat Tezgider/"), fileList);
 
-       
+       // parse işlemi
         HashMap<String, DocumentFields> hashMap = new HashMap<>();
         for (File file : fileList) {
             p.parseDocument(file,hashMap);
         }
 
+        // json verisine dönüştürme
         String result = p.toJSON(new ArrayList<>(hashMap.values()));
         System.out.println(result);
 
+        // Json verisini yazma 
         File outputFile = new File("/home/hduser/Desktop/bil625_data/output.txt");
         if (!outputFile.exists()) {
             try {
@@ -53,7 +51,7 @@ public class Parser {
                 Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        try (PrintWriter out = new PrintWriter("/home/hduser/Desktop/bil625_data/output.txt")) {
+        try (PrintWriter out = new PrintWriter(outputFile)) {
             out.println(result);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, null, ex);
@@ -61,7 +59,7 @@ public class Parser {
     }
 
     /**
-     * List<DocumentFields> listesine json verisine dönüştürür.
+     * List<DocumentFields> listesini json verisine dönüştürür.
      *
      * @param list
      * @return
@@ -79,7 +77,7 @@ public class Parser {
     }
 
     /**
-     * Verilen dizin ve alt dizinlerde bulunan dosyaları listeler
+     * Verilen dizin ve dizinin alt dizinlerinde bulunan dosyaları listeler.
      *
      * @param pFile
      * @param fileList
@@ -95,8 +93,9 @@ public class Parser {
     }
 
     /**
-     * Verilen dosyayı parse eder dosyada parse edilen verileri veri yapısı
-     * listesine aktarır.
+     * Verilen dosyayı parse eder, dosyadan parse edilen verileri veri yapısına aktardıktan sonra 
+     *  bir HashMap'e ekler.
+     * 
      *
      * @param file
      * @return
